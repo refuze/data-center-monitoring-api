@@ -23,10 +23,6 @@ import java.util.List;
 public class SensorController {
     private final SensorService sensorService;
 
-    @GetMapping("/all")
-    public ResponseEntity<List<SensorResponse>> getAllTemperatureSensors() {
-        return ResponseEntity.ok(sensorService.findAll());
-    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSensor(@PathVariable("id") long id) {
@@ -37,6 +33,11 @@ public class SensorController {
     @GetMapping("/categories")
     public ResponseEntity<List<String>> getAllCategories() {
         return ResponseEntity.ok(sensorService.findAllCategories());
+    }
+
+    @GetMapping("/categories/{category}")
+    public ResponseEntity<List<SensorResponse>> getSensorsByCategory(@PathVariable("category") String category) {
+        return ResponseEntity.ok(sensorService.findSensorsByCategory(category));
     }
 
     @PostMapping

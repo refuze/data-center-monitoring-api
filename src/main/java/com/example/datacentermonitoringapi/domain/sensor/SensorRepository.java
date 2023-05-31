@@ -34,4 +34,11 @@ public interface SensorRepository extends JpaRepository<Sensor, Long> {
             FROM Sensor s
             """)
     List<String> findAllCategories();
+
+    @Query("""
+            SELECT s
+            FROM Sensor s
+            WHERE s.category = :category
+            """)
+    List<Sensor> findSensorsByCategory(@Param("category") String category);
 }

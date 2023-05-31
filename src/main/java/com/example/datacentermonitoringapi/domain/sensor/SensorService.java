@@ -57,10 +57,6 @@ public class SensorService {
         sensorRepository.setCategoryById(category, id);
     }
 
-    public List<SensorResponse> findAll() {
-        return sensorRepository.findAll().stream().map(SensorMapper::toResponse).toList();
-    }
-
     public List<String> findAllCategories() {
         return sensorRepository.findAllCategories();
     }
@@ -68,5 +64,9 @@ public class SensorService {
     @Transactional
     public void delete(long id) {
         sensorRepository.deleteById(id);
+    }
+
+    public List<SensorResponse> findSensorsByCategory(String category) {
+        return sensorRepository.findSensorsByCategory(category).stream().map(SensorMapper::toResponse).toList();
     }
 }
