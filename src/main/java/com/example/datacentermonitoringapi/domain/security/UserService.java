@@ -2,6 +2,7 @@ package com.example.datacentermonitoringapi.domain.security;
 
 import com.example.datacentermonitoringapi.configuration.exception.HttpRuntimeException;
 import com.example.datacentermonitoringapi.domain.email.EmailService;
+import com.example.datacentermonitoringapi.util.Utils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @RequiredArgsConstructor
@@ -27,12 +27,27 @@ public class UserService {
 
     public User findById(Long id) {
         return userRepository.findById(id).orElseThrow(() ->
-                new HttpRuntimeException("User not found", HttpStatus.NOT_FOUND, null));
+                new HttpRuntimeException("User not found", HttpStatus.NOT_FOUND));
     }
 
     public User findByUsername(String username) {
-        return userRepository.findByUsername(username).orElseThrow(() ->
-                new HttpRuntimeException("User not found", HttpStatus.NOT_FOUND, null));
+        if (username.equals("admin")) {
+            return findAdmin().orElseThrow(() -> new HttpRuntimeException("Admin not found", HttpStatus.NOT_FOUND));
+        }
+        long id = extractIdFromUsername(username);
+        return findById(id);
+    }
+
+    public Optional<User> findAdmin() {
+        return userRepository.findAdmin();
+    }
+
+    private long extractIdFromUsername(String username) {
+        if (!username.startsWith("user_")) {
+            throw new HttpRuntimeException("Incorrect username format", HttpStatus.BAD_REQUEST);
+        }
+
+        return Utils.extractIdFromUsername(username);
     }
 
     public User findPrincipal() {
@@ -55,37 +70,27 @@ public class UserService {
 
     @Transactional
     public void changeEmail(String email) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-
         if (userRepository.findByEmail(email).isPresent()) {
             throw new HttpRuntimeException("Email already exist", HttpStatus.CONFLICT, null);
         }
-
-        userRepository.changeEmailByUsername(email, username);
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        long id = extractIdFromUsername(username);
+        userRepository.changeEmailById(email, id);
     }
 
     @Transactional
     public void register(String email) {
         Optional<User> userOpt = userRepository.findByEmail(email);
+        User user = userOpt.orElseGet(User::new);
 
-        if (userOpt.isPresent()) {
-            return;
-        }
-
-        String username = generateUniqueUsername();
         String password = PasswordUtil.generateSecureRandomPassword(10, 10, 10);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setEmail(email);
+        user.setRole(Role.USER);
+        user.setNotificationEnabled(true);
 
-        User newUser = User.builder()
-                .email(email)
-                .username(username)
-                .password(passwordEncoder.encode(password))
-                .role(Role.USER)
-                .isNotificationEnabled(true)
-                .build();
-
-        userRepository.save(newUser);
-
-        sendRegistrationEmail(username, password, email);
+        User saveduser = userRepository.save(user);
+        emailService.sendRegistrationEmail(saveduser.getUsername(), password, email);
     }
 
     public String authenticate(LoginRequest loginRequest) {
@@ -94,30 +99,11 @@ public class UserService {
         Authentication auth = authManager.authenticate(authReq);
         SecurityContextHolder.getContext().setAuthentication(auth);
         User user = findByUsername(loginRequest.getUsername());
-        if (user.getRole().equals(Role.SENSOR)) {
-            throw new HttpRuntimeException("Sensor can't authenticate", HttpStatus.BAD_REQUEST);
-        }
         return jwtService.generateToken(user);
     }
 
-    private String generateUniqueUsername() {
-        String username;
-        do {
-            username = "username_" + ThreadLocalRandom.current().nextInt(100000, 999999);
-        } while (userRepository.findByUsername(username).isPresent());
-        return username;
+    @Transactional
+    public void save(User user) {
+        userRepository.save(user);
     }
-
-    private void sendRegistrationEmail(String username, String password, String email) {
-        emailService.sendSimpleEmail(
-                email,
-                "Registration success",
-                """
-                 Вы успешно зарегестрированы в системе, вот ваши данные для входа:
-                 Имя пользователя: %s
-                 Пароль: %s
-                 """.formatted(username, password)
-        );
-    }
-
 }

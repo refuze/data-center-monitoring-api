@@ -18,7 +18,6 @@ import java.util.function.Function;
 @Service
 @RequiredArgsConstructor
 public class JwtService {
-    private final String JWT_SECRET = "655368566D5970337336763979244226452948404D635166546A576E5A723474";
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -69,7 +68,9 @@ public class JwtService {
     }
 
     private Key getSignInKey() {
+        final String JWT_SECRET = "655368566D5970337336763979244226452948404D635166546A576E5A723474";
         byte[] keyBytes = Decoders.BASE64.decode(JWT_SECRET);
         return Keys.hmacShaKeyFor(keyBytes);
     }
+
 }

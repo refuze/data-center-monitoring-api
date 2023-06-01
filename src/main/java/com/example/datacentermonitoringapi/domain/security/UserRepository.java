@@ -15,17 +15,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("""
             SELECT u
             FROM User u
-            WHERE u.role != "SENSOR"
+            WHERE u.role != 'ADMIN'
             """)
     List<User> findAllUsers();
-
-    @Query("""
-            SELECT u
-            FROM User u
-            WHERE u.username = :username
-            """)
-    Optional<User> findByUsername(@Param("username") String username);
-
 
     @Query("""
             SELECT u.email
@@ -45,8 +37,15 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("""
             UPDATE User u
             SET u.email = :email
-            WHERE u.username = :username
+            WHERE u.id = :id
             """)
-    void changeEmailByUsername(@Param("email") String email,
-                               @Param("username") String username);
+    void changeEmailById(@Param("email") String email,
+                         @Param("id") long id);
+
+    @Query("""
+            SELECT u
+            FROM User u
+            WHERE u.role = 'ADMIN'
+            """)
+    Optional<User> findAdmin();
 }

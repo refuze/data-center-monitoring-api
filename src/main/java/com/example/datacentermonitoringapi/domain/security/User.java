@@ -44,9 +44,6 @@ public class User implements UserDetails {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "username", unique = true, nullable = false)
-    private String username;
-
     @Column(name = "password", nullable = false)
     private String password;
 
@@ -63,6 +60,15 @@ public class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(role);
+    }
+
+    @Override
+    public String getUsername() {
+        if (role.equals(Role.ADMIN)) {
+            return "admin";
+        } else {
+            return "user_" + id;
+        }
     }
 
     @Override

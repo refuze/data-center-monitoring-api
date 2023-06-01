@@ -2,7 +2,7 @@ package com.example.datacentermonitoringapi.configuration;
 
 import com.example.datacentermonitoringapi.domain.security.Role;
 import com.example.datacentermonitoringapi.domain.security.User;
-import com.example.datacentermonitoringapi.domain.security.UserRepository;
+import com.example.datacentermonitoringapi.domain.security.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,7 +13,7 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class AdminInitializer implements CommandLineRunner {
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
 
 
@@ -23,18 +23,17 @@ public class AdminInitializer implements CommandLineRunner {
     }
 
     private void createAdminUserIfNotExists() {
-        Optional<User> adminUser = userRepository.findByUsername("admin");
+        Optional<User> adminUser = userService.findAdmin();
 
         if (adminUser.isEmpty()) {
             User user = User.builder()
-                    .username("admin")
                     .password(passwordEncoder.encode("admin"))
-                    .email("not_an_email")
+                    .email("")
                     .isNotificationEnabled(false)
                     .role(Role.ADMIN)
                     .build();
 
-            userRepository.save(user);
+            userService.save(user);
         }
     }
 }

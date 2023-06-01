@@ -19,4 +19,17 @@ public class EmailService {
         javaMailSender.send(message);
     }
 
+    public void sendRegistrationEmail(String username, String password, String email) {
+        sendSimpleEmail(
+                email,
+                "Registration success",
+                """
+                 Поздравляем с успешной регистрацией в системе, ваши данные для входа:
+                 
+                 Форма для входа: https://kryukov.cloud/login
+                 Имя пользователя: %s
+                 Пароль: %s
+                 """.formatted(username, password)
+        );
+    }
 }
