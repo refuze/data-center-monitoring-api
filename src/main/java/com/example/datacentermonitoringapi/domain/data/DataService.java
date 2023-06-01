@@ -20,13 +20,13 @@ public class DataService {
     private final UserService userService;
     private final EmailService emailService;
 
-    public List<DataResponse> findBySensorId(Long sensorId) {
+    public List<DataResponse> findBySensorId(long sensorId) {
         return dataRepository.findBySensorId(sensorId).stream().map(DataMapper::toResponse).toList();
     }
 
     @Transactional
-    public void addValue(Long sensorId, double value) {
-        Sensor sensor = sensorService.findOrCreate(sensorId);
+    public void addValue(long sensorId, double value) {
+        Sensor sensor = sensorService.findById(sensorId);
         Data savedData = dataRepository.save(Data.builder()
                 .value(value)
                 .sensor(sensor)

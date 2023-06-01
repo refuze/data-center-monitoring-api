@@ -15,17 +15,9 @@ import java.util.List;
 public class SensorService {
     private final SensorRepository sensorRepository;
 
-    public Sensor findById(Long id) {
+    public Sensor findById(long id) {
         return sensorRepository.findById(id).orElseThrow(() ->
                 new HttpRuntimeException("There is no such sensor", HttpStatus.NOT_FOUND));
-    }
-
-    @Transactional
-    public Sensor findOrCreate(Long id) {
-        return sensorRepository.findById(id).orElseGet(() -> {
-            Sensor newSensor = Sensor.builder().id(id).build();
-            return sensorRepository.save(newSensor);
-        });
     }
 
     @Transactional
@@ -40,7 +32,7 @@ public class SensorService {
     }
 
     @Transactional
-    public void update(Long id, SensorRequest request) {
+    public void update(long id, SensorRequest request) {
         Sensor sensor = findById(id);
         EntityPatcher<Sensor, SensorRequest> patcher = new EntityPatcher<>();
         Sensor patchedSensor = patcher.patch(sensor, request);
@@ -48,12 +40,12 @@ public class SensorService {
     }
 
     @Transactional
-    public void setName(Long id, String name) {
+    public void setName(long id, String name) {
         sensorRepository.setNameById(name, id);
     }
 
     @Transactional
-    public void setCategory(Long id, String category) {
+    public void setCategory(long id, String category) {
         sensorRepository.setCategoryById(category, id);
     }
 

@@ -25,7 +25,7 @@ public class UserService {
     private final JwtService jwtService;
     private final AuthenticationManager authManager;
 
-    public User findById(Long id) {
+    public User findById(long id) {
         return userRepository.findById(id).orElseThrow(() ->
                 new HttpRuntimeException("User not found", HttpStatus.NOT_FOUND));
     }
@@ -64,7 +64,7 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteById(Long id) {
+    public void deleteById(long id) {
         userRepository.deleteById(id);
     }
 
@@ -83,7 +83,7 @@ public class UserService {
         Optional<User> userOpt = userRepository.findByEmail(email);
         User user = userOpt.orElseGet(User::new);
 
-        String password = PasswordUtil.generateSecureRandomPassword(10, 10, 10);
+        String password = PasswordUtil.generateSecureRandomPassword(3, 3, 4);
         user.setPassword(passwordEncoder.encode(password));
         user.setEmail(email);
         user.setRole(Role.USER);

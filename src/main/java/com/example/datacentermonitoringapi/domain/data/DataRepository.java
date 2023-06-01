@@ -15,5 +15,5 @@ public interface DataRepository extends JpaRepository<Data, Long> {
             FROM Data d
             WHERE d.sensor.id = :sensorId
             """)
-    List<Data> findBySensorId(@Param("sensorId") Long sensorId);
+    List<Data> findBySensorId(@Param("sensorId") long sensorId);
 }

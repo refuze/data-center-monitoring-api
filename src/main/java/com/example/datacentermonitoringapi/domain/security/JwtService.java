@@ -58,6 +58,8 @@ public class JwtService {
             Map<String, Object> extraClaims,
             UserDetails userDetails
     ) {
+        String role = userDetails.getAuthorities().stream().findFirst().get().getAuthority();
+        extraClaims.put("role", role);
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -35,13 +36,13 @@ public class SecurityController {
     }
 
     @PatchMapping("/email")
-    public ResponseEntity<Void> patchEmail(@RequestBody String email) {
+    public ResponseEntity<Void> patchEmail(@RequestParam("email") String email) {
         userService.changeEmail(email);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/registration")
-    public ResponseEntity<Void> registration(@RequestBody String email) {
+    public ResponseEntity<Void> registration(@RequestParam("email") String email) {
         userService.register(email);
         return ResponseEntity.ok().build();
     }
@@ -52,7 +53,7 @@ public class SecurityController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") long id) {
         userService.deleteById(id);
         return ResponseEntity.ok().build();
     }

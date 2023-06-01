@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SensorResponse {
 
-    private Long id;
+    private long id;
     private String name;
     private double minDataValue;
     private double maxDataValue;

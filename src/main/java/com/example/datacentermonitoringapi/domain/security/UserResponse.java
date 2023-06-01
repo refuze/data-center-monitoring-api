@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserResponse {
 
-    private Long id;
+    private long id;
     private String username;
     private String email;
     private boolean isNotificationEnabled;
