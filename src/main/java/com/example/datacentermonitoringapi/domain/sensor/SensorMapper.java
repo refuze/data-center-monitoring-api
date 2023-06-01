@@ -5,6 +5,7 @@ public class SensorMapper {
     public static Sensor toEntity(SensorRequest request) {
         return Sensor.builder()
                 .name(request.getName())
+                .category(request.getCategory())
                 .minDataValue(request.getMinDateValue())
                 .maxDataValue(request.getMaxDateValue())
                 .build();

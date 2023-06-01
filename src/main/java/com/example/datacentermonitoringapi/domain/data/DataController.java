@@ -19,15 +19,24 @@ import java.util.List;
 public class DataController {
     private final DataService dataService;
 
-    @GetMapping("/{sensorId}")
+    @GetMapping("/all/{sensorId}")
     public ResponseEntity<List<DataResponse>> getDataBySensorId(@PathVariable("sensorId") long sensorId) {
         return ResponseEntity.ok(dataService.findBySensorId(sensorId));
     }
 
-    @PostMapping("/{sensorId}")
-    public ResponseEntity<Void> postData(@PathVariable("sensorId") long sensorId,
-                                         @RequestParam("value") double value) {
-        dataService.addValue(sensorId, value);
+    @GetMapping("/error/{sensorId}")
+    public ResponseEntity<List<DataResponse>> getErrorDataBySensorId(@PathVariable("sensorId") long sensorId) {
+        return ResponseEntity.ok(dataService.findErrorBySensorId(sensorId));
+    }
+
+    @GetMapping("/actual/{sensorId}")
+    public ResponseEntity<List<DataResponse>> getActualDataBySensorId(@PathVariable("sensorId") long sensorId) {
+        return ResponseEntity.ok(dataService.findActualBySensorId(sensorId));
+    }
+
+    @PostMapping
+    public ResponseEntity<Void> postData(@RequestParam("value") double value) {
+        dataService.addValue(value);
         return ResponseEntity.ok().build();
     }
 

@@ -1,8 +1,10 @@
 package com.example.datacentermonitoringapi.domain.sensor;
 
+import com.example.datacentermonitoringapi.component.EntityPatcher;
 import com.example.datacentermonitoringapi.configuration.exception.HttpRuntimeException;
 import com.example.datacentermonitoringapi.domain.data.Data;
-import com.example.datacentermonitoringapi.component.EntityPatcher;
+import com.example.datacentermonitoringapi.domain.security.JwtService;
+import com.example.datacentermonitoringapi.util.Utils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,10 +16,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SensorService {
     private final SensorRepository sensorRepository;
+    private final JwtService jwtService;
 
     public Sensor findById(long id) {
         return sensorRepository.findById(id).orElseThrow(() ->
                 new HttpRuntimeException("There is no such sensor", HttpStatus.NOT_FOUND));
+    }
+
+    public Sensor findByUsername(String username) {
+        long id = extractIdFromUsername(username);
+        return findById(id);
     }
 
     @Transactional
@@ -28,7 +36,10 @@ public class SensorService {
 
     @Transactional
     public long save(SensorRequest request) {
-        return sensorRepository.save(SensorMapper.toEntity(request)).getId();
+        Sensor sensor = SensorMapper.toEntity(request);
+        Sensor saved = sensorRepository.save(sensor);
+        saved.setJwtToken(jwtService.generateToken(saved));
+        return sensorRepository.save(saved).getId();
     }
 
     @Transactional
@@ -60,5 +71,18 @@ public class SensorService {
 
     public List<SensorResponse> findSensorsByCategory(String category) {
         return sensorRepository.findSensorsByCategory(category).stream().map(SensorMapper::toResponse).toList();
+    }
+
+    private long extractIdFromUsername(String username) {
+        if (!username.startsWith("sensor_")) {
+            throw new HttpRuntimeException("Incorrect username format", HttpStatus.BAD_REQUEST);
+        }
+
+        return Utils.extractIdFromUsername(username);
+    }
+
+
+    public String findJwtById(long id) {
+        return sensorRepository.findJwtById(id);
     }
 }

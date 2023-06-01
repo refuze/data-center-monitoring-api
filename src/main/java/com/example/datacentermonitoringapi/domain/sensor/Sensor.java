@@ -63,6 +63,8 @@ public class Sensor implements UserDetails {
     @Column(name = "max_data_value")
     private double maxDataValue;
 
+    @Column(name = "jwt_token")
+    private String jwtToken;
 
     @Override
     public boolean equals(Object o) {
@@ -89,7 +91,7 @@ public class Sensor implements UserDetails {
 
     @Override
     public String getUsername() {
-        return id.toString();
+        return "sensor_" + id;
     }
 
     @Override

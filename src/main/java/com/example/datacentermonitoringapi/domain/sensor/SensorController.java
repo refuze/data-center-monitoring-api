@@ -24,12 +24,6 @@ public class SensorController {
     private final SensorService sensorService;
 
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSensor(@PathVariable("id") long id) {
-        sensorService.delete(id);
-        return ResponseEntity.ok().build();
-    }
-
     @GetMapping("/categories")
     public ResponseEntity<List<String>> getAllCategories() {
         return ResponseEntity.ok(sensorService.findAllCategories());
@@ -38,6 +32,11 @@ public class SensorController {
     @GetMapping("/categories/{category}")
     public ResponseEntity<List<SensorResponse>> getSensorsByCategory(@PathVariable("category") String category) {
         return ResponseEntity.ok(sensorService.findSensorsByCategory(category));
+    }
+
+    @GetMapping("/jwt/{id}")
+    public ResponseEntity<String> getJwt(@PathVariable("id") long id) {
+        return ResponseEntity.ok(sensorService.findJwtById(id));
     }
 
     @PostMapping
@@ -63,6 +62,12 @@ public class SensorController {
     public ResponseEntity<Void> updateSensorCategory(@PathVariable("id") long id,
                                                      @RequestParam("category") String category) {
         sensorService.setCategory(id, category);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteSensor(@PathVariable("id") long id) {
+        sensorService.delete(id);
         return ResponseEntity.ok().build();
     }
 }

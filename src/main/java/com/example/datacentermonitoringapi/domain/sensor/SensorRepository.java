@@ -41,4 +41,11 @@ public interface SensorRepository extends JpaRepository<Sensor, Long> {
             WHERE s.category = :category
             """)
     List<Sensor> findSensorsByCategory(@Param("category") String category);
+
+    @Query("""
+            SELECT s.jwtToken
+            FROM Sensor s
+            WHERE s.id = :id
+            """)
+    String findJwtById(@Param("id") long id);
 }

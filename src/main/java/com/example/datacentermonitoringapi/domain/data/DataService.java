@@ -6,6 +6,7 @@ import com.example.datacentermonitoringapi.domain.sensor.Sensor;
 import com.example.datacentermonitoringapi.domain.sensor.SensorService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,18 +26,22 @@ public class DataService {
     }
 
     @Transactional
-    public void addValue(long sensorId, double value) {
-        Sensor sensor = sensorService.findById(sensorId);
+    public void addValue(double value) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Sensor sensor = sensorService.findByUsername(username);
+
         Data savedData = dataRepository.save(Data.builder()
                 .value(value)
                 .sensor(sensor)
                 .date(LocalDateTime.now(ZoneId.of("Europe/Moscow")))
                 .build());
+
         sensorService.addData(sensor, savedData);
-        checkTemperature(savedData, sensor);
+
+        checkData(savedData, sensor);
     }
 
-    private void checkTemperature(Data data, Sensor sensor) {
+    private void checkData(Data data, Sensor sensor) {
         String subject;
         String text;
 
@@ -45,15 +50,17 @@ public class DataService {
             text = """
                     Высокие показатели (%.2f) на датчике:
                     id: %d
+                    категория: %s
                     название: %s
-                    """.formatted(data.getValue(), sensor.getId(), sensor.getName());
+                    """.formatted(data.getValue(), sensor.getId(), sensor.getCategory(), sensor.getName());
         } else if (data.getValue() < sensor.getMinDataValue()) {
             subject = "Низкие показатели на датчике: %s".formatted(sensor.getName());
             text = """
                     Низкие показатели (%.2f) на датчике:
                     id: %d
+                    категория: %s
                     название: %s
-                    """.formatted(data.getValue(), sensor.getId(), sensor.getName());
+                    """.formatted(data.getValue(), sensor.getId(), sensor.getCategory(), sensor.getName());
         } else {
             return;
         }
@@ -64,5 +71,15 @@ public class DataService {
         }
     }
 
+    public List<DataResponse> findErrorBySensorId(long sensorId) {
+        return dataRepository.findErrorBySensorId(sensorId).stream()
+                .map(DataMapper::toResponse).toList();
+    }
 
+    public List<DataResponse> findActualBySensorId(long sensorId) {
+        return dataRepository.findActualBySensorId(
+                sensorId,
+                LocalDateTime.now(ZoneId.of("Europe/Moscow")).minusHours(1)
+        ).stream().map(DataMapper::toResponse).toList();
+    }
 }

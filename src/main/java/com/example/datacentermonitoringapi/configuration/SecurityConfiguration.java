@@ -40,13 +40,21 @@ public class SecurityConfiguration {
                 ).permitAll()
                 .requestMatchers(
                         HttpMethod.POST,
-                        "/api/v1/data/**"
+                        "/api/v1/data"
                 ).hasRole("SENSOR")
                 .requestMatchers(
                         "/api/v1/security/email"
                 ).hasRole("USER")
                 .requestMatchers(
-                        "/api/v1/security/**"
+                        "/api/v1/security/**",
+                        "/api/v1/sensor/jwt/**"
+                ).hasRole("ADMIN")
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/v1/sensor/**"
+                ).hasAnyRole("USER", "ADMIN")
+                .requestMatchers(
+                        "/api/v1/sensor/**"
                 ).hasRole("ADMIN")
                 .requestMatchers(
                         "/api/v1/**"
