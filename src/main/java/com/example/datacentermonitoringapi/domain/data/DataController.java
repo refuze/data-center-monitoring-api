@@ -36,7 +36,7 @@ public class DataController {
 
     @PostMapping
     public ResponseEntity<Void> postData(@RequestParam("value") double value) {
-        dataService.addValue(value);
+        dataService.addValueAndNotify(value);
         return ResponseEntity.ok().build();
     }
 

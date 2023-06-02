@@ -57,6 +57,9 @@ public class SecurityConfiguration {
                         "/api/v1/sensor/**"
                 ).hasRole("ADMIN")
                 .requestMatchers(
+                        "/api/v1/ws/**"
+                ).permitAll()
+                .requestMatchers(
                         "/api/v1/**"
                 ).hasAnyRole("USER", "ADMIN")
                 .anyRequest()

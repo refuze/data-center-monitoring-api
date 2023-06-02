@@ -6,6 +6,7 @@ import com.example.datacentermonitoringapi.domain.sensor.Sensor;
 import com.example.datacentermonitoringapi.domain.sensor.SensorService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -20,13 +21,14 @@ public class DataService {
     private final SensorService sensorService;
     private final UserService userService;
     private final EmailService emailService;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     public List<DataResponse> findBySensorId(long sensorId) {
         return dataRepository.findBySensorId(sensorId).stream().map(DataMapper::toResponse).toList();
     }
 
     @Transactional
-    public void addValue(double value) {
+    public void addValueAndNotify(double value) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Sensor sensor = sensorService.findByUsername(username);
 
@@ -39,6 +41,8 @@ public class DataService {
         sensorService.addData(sensor, savedData);
 
         checkData(savedData, sensor);
+
+        simpMessagingTemplate.convertAndSend("/topic/data/" + sensor.getId(), savedData.getValue());
     }
 
     private void checkData(Data data, Sensor sensor) {
@@ -64,6 +68,8 @@ public class DataService {
         } else {
             return;
         }
+
+        simpMessagingTemplate.convertAndSend("/topic/data/error/", sensor.getId());
 
         List<String> emails = userService.getNotifiableEmails();
         for (String email : emails) {

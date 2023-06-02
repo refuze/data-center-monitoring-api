@@ -8,6 +8,7 @@ import com.example.datacentermonitoringapi.util.Utils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.List;
 public class SensorService {
     private final SensorRepository sensorRepository;
     private final JwtService jwtService;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     public Sensor findById(long id) {
         return sensorRepository.findById(id).orElseThrow(() ->
@@ -39,7 +41,11 @@ public class SensorService {
         Sensor sensor = SensorMapper.toEntity(request);
         Sensor saved = sensorRepository.save(sensor);
         saved.setJwtToken(jwtService.generateToken(saved));
-        return sensorRepository.save(saved).getId();
+        long id = sensorRepository.save(saved).getId();
+
+        simpMessagingTemplate.convertAndSend("/topic/sensor/new/", id);
+
+        return id;
     }
 
     @Transactional
@@ -47,17 +53,9 @@ public class SensorService {
         Sensor sensor = findById(id);
         EntityPatcher<Sensor, SensorRequest> patcher = new EntityPatcher<>();
         Sensor patchedSensor = patcher.patch(sensor, request);
-        sensorRepository.save(patchedSensor);
-    }
+        long savedId = sensorRepository.save(patchedSensor).getId();
 
-    @Transactional
-    public void setName(long id, String name) {
-        sensorRepository.setNameById(name, id);
-    }
-
-    @Transactional
-    public void setCategory(long id, String category) {
-        sensorRepository.setCategoryById(category, id);
+        simpMessagingTemplate.convertAndSend("/topic/sensor/update/", savedId);
     }
 
     public List<String> findAllCategories() {
@@ -67,6 +65,8 @@ public class SensorService {
     @Transactional
     public void delete(long id) {
         sensorRepository.deleteById(id);
+
+        simpMessagingTemplate.convertAndSend("/topic/sensor/delete/", id);
     }
 
     public List<SensorResponse> findSensorsByCategory(String category) {
