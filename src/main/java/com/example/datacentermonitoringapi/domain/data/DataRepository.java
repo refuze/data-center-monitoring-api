@@ -28,7 +28,7 @@ public interface DataRepository extends JpaRepository<Data, Long> {
     @Query("""
             SELECT d
             FROM Data d
-            WHERE d.date >= :date AND d.sensor = :sensorId
+            WHERE d.date >= :date AND d.sensor.id = :sensorId
             """)
     List<Data> findActualBySensorId(@Param("sensorId") long sensorId,
                                     @Param("date") LocalDateTime date);
