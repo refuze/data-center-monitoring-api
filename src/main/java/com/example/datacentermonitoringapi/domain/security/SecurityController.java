@@ -41,6 +41,12 @@ public class SecurityController {
         return ResponseEntity.ok().build();
     }
 
+    @PatchMapping("/password")
+    public ResponseEntity<Void> patchPassword(@RequestBody String password) {
+        userService.changeAdminPassword(password);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/registration")
     public ResponseEntity<Void> registration(@RequestParam("email") String email) {
         userService.register(email);

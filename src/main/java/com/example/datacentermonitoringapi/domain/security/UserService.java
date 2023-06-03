@@ -106,4 +106,9 @@ public class UserService {
     public void save(User user) {
         userRepository.save(user);
     }
+
+    @Transactional
+    public void changeAdminPassword(String password) {
+        userRepository.updateAdminPassword(passwordEncoder.encode(password));
+    }
 }

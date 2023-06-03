@@ -48,4 +48,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
             WHERE u.role = 'ADMIN'
             """)
     Optional<User> findAdmin();
+
+    @Modifying
+    @Query("""
+            UPDATE User u
+            SET u.password = :password
+            WHERE u.role = 'ADMIN'
+            """)
+    void updateAdminPassword(@Param("password") String password);
 }
