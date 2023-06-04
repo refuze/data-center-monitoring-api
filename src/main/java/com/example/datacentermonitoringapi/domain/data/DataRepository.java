@@ -15,6 +15,7 @@ public interface DataRepository extends JpaRepository<Data, Long> {
             SELECT d
             FROM Data d
             WHERE d.sensor.id = :sensorId
+            ORDER BY d.date
             """)
     List<Data> findBySensorId(@Param("sensorId") long sensorId);
 
@@ -22,6 +23,7 @@ public interface DataRepository extends JpaRepository<Data, Long> {
             SELECT d
             FROM Data d
             WHERE d.sensor.id = :sensorId AND (d.value > d.sensor.maxDataValue OR d.value < d.sensor.minDataValue)
+            ORDER BY d.date
             """)
     List<Data> findErrorBySensorId(@Param("sensorId") long sensorId);
 
@@ -29,6 +31,7 @@ public interface DataRepository extends JpaRepository<Data, Long> {
             SELECT d
             FROM Data d
             WHERE d.date >= :date AND d.sensor.id = :sensorId
+            ORDER BY d.date
             """)
     List<Data> findActualBySensorId(@Param("sensorId") long sensorId,
                                     @Param("date") LocalDateTime date);
