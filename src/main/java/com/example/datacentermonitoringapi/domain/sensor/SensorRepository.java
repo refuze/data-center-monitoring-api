@@ -13,6 +13,7 @@ public interface SensorRepository extends JpaRepository<Sensor, Long> {
     @Query("""
             SELECT DISTINCT s.category
             FROM Sensor s
+            ORDER BY s.category
             """)
     List<String> findAllCategories();
 
@@ -20,6 +21,7 @@ public interface SensorRepository extends JpaRepository<Sensor, Long> {
             SELECT s
             FROM Sensor s
             WHERE s.category = :category
+            ORDER BY s.name
             """)
     List<Sensor> findSensorsByCategory(@Param("category") String category);
 
