@@ -19,9 +19,9 @@ public class SensorRequest {
     private String name;
 
     @JsonProperty("min_data_value")
-    private double minDateValue;
+    private double minDataValue;
 
     @JsonProperty("max_data_value")
-    private double maxDateValue;
+    private double maxDataValue;
 
 }
