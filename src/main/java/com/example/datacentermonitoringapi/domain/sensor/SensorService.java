@@ -51,8 +51,7 @@ public class SensorService {
     @Transactional
     public void update(long id, SensorRequest request) {
         Sensor sensor = findById(id);
-        EntityPatcher<Sensor, SensorRequest> patcher = new EntityPatcher<>();
-        Sensor patchedSensor = patcher.patch(sensor, request);
+        Sensor patchedSensor = EntityPatcher.patch(sensor, request);
         long savedId = sensorRepository.save(patchedSensor).getId();
 
         simpMessagingTemplate.convertAndSend("/topic/sensor/update/", savedId);

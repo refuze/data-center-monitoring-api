@@ -1,6 +1,8 @@
 package com.example.datacentermonitoringapi.domain.data;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,13 +22,19 @@ public class DataController {
     private final DataService dataService;
 
     @GetMapping("/all/{sensorId}")
-    public ResponseEntity<List<DataResponse>> getDataBySensorId(@PathVariable("sensorId") long sensorId) {
-        return ResponseEntity.ok(dataService.findBySensorId(sensorId));
+    public ResponseEntity<List<DataResponse>> getDataBySensorId(@PathVariable("sensorId") long sensorId,
+                                                                @RequestParam(defaultValue = "0") int page,
+                                                                @RequestParam(defaultValue = "" + Integer.MAX_VALUE) int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(dataService.findBySensorId(sensorId, pageable));
     }
 
     @GetMapping("/error/{sensorId}")
-    public ResponseEntity<List<DataResponse>> getErrorDataBySensorId(@PathVariable("sensorId") long sensorId) {
-        return ResponseEntity.ok(dataService.findErrorBySensorId(sensorId));
+    public ResponseEntity<List<DataResponse>> getErrorDataBySensorId(@PathVariable("sensorId") long sensorId,
+                                                                     @RequestParam(defaultValue = "0") int page,
+                                                                     @RequestParam(defaultValue = "" + Integer.MAX_VALUE) int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(dataService.findErrorBySensorId(sensorId, pageable));
     }
 
     @GetMapping("/actual/{sensorId}")

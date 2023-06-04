@@ -7,13 +7,13 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EntityPatcher<E, T> {
-    public E patch(E entity, T object) {
+public class EntityPatcher {
+    public static <E, T>  E patch(E entity, T object) {
         Map<String, Object> map = convertToMap(object);
         return patch(entity, map);
     }
 
-    private Map<String, Object> convertToMap(T object) {
+    private static <T> Map<String, Object> convertToMap(T object) {
         Map<String, Object> map = new HashMap<>();
         Class<?> clazz = object.getClass();
         Field[] fields = clazz.getDeclaredFields();
@@ -29,7 +29,7 @@ public class EntityPatcher<E, T> {
         return map;
     }
 
-    private E patch(E entity, Map<String, Object> data) {
+    private static <E> E patch(E entity, Map<String, Object> data) {
         Class<?> clazz = entity.getClass();
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
@@ -42,7 +42,7 @@ public class EntityPatcher<E, T> {
         return entity;
     }
 
-    private void setValue(String fieldName, E data, Object value) {
+    private static <E> void setValue(String fieldName, E data, Object value) {
         try {
             var field = data.getClass().getDeclaredField(fieldName);
             field.setAccessible(true);

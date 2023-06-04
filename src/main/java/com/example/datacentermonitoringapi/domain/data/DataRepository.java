@@ -1,5 +1,7 @@
 package com.example.datacentermonitoringapi.domain.data;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,7 +19,8 @@ public interface DataRepository extends JpaRepository<Data, Long> {
             WHERE d.sensor.id = :sensorId
             ORDER BY d.date DESC
             """)
-    List<Data> findBySensorId(@Param("sensorId") long sensorId);
+    Page<Data> findBySensorId(@Param("sensorId") long sensorId,
+                              Pageable pageable);
 
     @Query("""
             SELECT d
@@ -25,7 +28,8 @@ public interface DataRepository extends JpaRepository<Data, Long> {
             WHERE d.sensor.id = :sensorId AND (d.value > d.sensor.maxDataValue OR d.value < d.sensor.minDataValue)
             ORDER BY d.date DESC
             """)
-    List<Data> findErrorBySensorId(@Param("sensorId") long sensorId);
+    Page<Data> findErrorBySensorId(@Param("sensorId") long sensorId,
+                                   Pageable pageable);
 
     @Query("""
             SELECT d

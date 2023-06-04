@@ -6,6 +6,7 @@ import com.example.datacentermonitoringapi.domain.sensor.Sensor;
 import com.example.datacentermonitoringapi.domain.sensor.SensorService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -23,8 +24,8 @@ public class DataService {
     private final EmailService emailService;
     private final SimpMessagingTemplate simpMessagingTemplate;
 
-    public List<DataResponse> findBySensorId(long sensorId) {
-        return dataRepository.findBySensorId(sensorId).stream().map(DataMapper::toResponse).toList();
+    public List<DataResponse> findBySensorId(long sensorId, Pageable pageable) {
+        return dataRepository.findBySensorId(sensorId, pageable).stream().map(DataMapper::toResponse).toList();
     }
 
     @Transactional
@@ -77,8 +78,8 @@ public class DataService {
         }
     }
 
-    public List<DataResponse> findErrorBySensorId(long sensorId) {
-        return dataRepository.findErrorBySensorId(sensorId).stream()
+    public List<DataResponse> findErrorBySensorId(long sensorId, Pageable pageable) {
+        return dataRepository.findErrorBySensorId(sensorId, pageable).stream()
                 .map(DataMapper::toResponse).toList();
     }
 
