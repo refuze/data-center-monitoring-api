@@ -6,8 +6,8 @@ public class SensorMapper {
         return Sensor.builder()
                 .name(request.getName())
                 .category(request.getCategory())
-                .minDataValue(request.getMinDateValue())
-                .maxDataValue(request.getMaxDateValue())
+                .minDataValue(request.getMinDataValue())
+                .maxDataValue(request.getMaxDataValue())
                 .build();
     }
 
